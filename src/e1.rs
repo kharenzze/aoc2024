@@ -1,8 +1,11 @@
 use itertools::Itertools;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
 type Input = (Vec<i64>, Vec<i64>, usize);
+type Output1 = i64;
+type Output2 = i64;
 
 const DAY: usize = 1;
 
@@ -24,7 +27,7 @@ fn read_data(is_test: bool) -> Input {
   (v1, v2, capacity)
 }
 
-fn initial(input: Input) -> i64 {
+fn initial(input: Input) -> Output1 {
   let (v1, v2, capacity) = input;
   let v1_sorted: Vec<i64> = v1.iter().sorted().cloned().collect();
   let v2_sorted: Vec<i64> = v2.iter().sorted().cloned().collect();
@@ -36,13 +39,32 @@ fn initial(input: Input) -> i64 {
   sum
 }
 
-fn extra(input: Input) -> usize {
-  unimplemented!()
+fn extra(input: Input) -> Output2 {
+  let (v1, v2, capacity) = input;
+  let mut hist: HashMap<i64, i64> = HashMap::new();
+  for i in 0..capacity {
+    let key = v2[i];
+    *hist.entry(key).or_insert(0) += 1;
+  }
+
+  let values: Vec<i64> = v1
+    .iter()
+    .map(|v| {
+      let instances = hist.get(v).or(Some(&0)).cloned().unwrap();
+      instances * v
+    })
+    .collect();
+  let sum: i64 = values.iter().sum();
+  sum
 }
 
-pub fn solve() {
+pub fn solve(part: usize) {
   let input = read_data(false);
-  let score = initial(input);
+  let score = if part == 1 {
+    initial(input)
+  } else {
+    extra(input)
+  };
   println!("{score}")
 }
 
@@ -61,6 +83,6 @@ mod tests {
   fn two() {
     let input = read_data(true);
     let score = extra(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 31)
   }
 }
