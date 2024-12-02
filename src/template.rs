@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
 type Input = Vec<String>;
+type Output1 = i64;
+type Output2 = i64;
 
 const DAY: usize = 1;
 
@@ -14,17 +16,21 @@ fn read_data(is_test: bool) -> Input {
   line_iter.map(|l| l.unwrap()).collect()
 }
 
-fn initial(input: Input) -> usize {
+fn initial(input: Input) -> Output1 {
   unimplemented!()
 }
 
-fn extra(input: Input) -> usize {
+fn extra(input: Input) -> Output2 {
   unimplemented!()
 }
 
-pub fn solve() {
+pub fn solve(part: usize) {
   let input = read_data(false);
-  let score = initial(input);
+  let score = if part == 1 {
+    initial(input)
+  } else {
+    extra(input)
+  };
   println!("{score}")
 }
 
