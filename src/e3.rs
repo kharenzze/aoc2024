@@ -1,7 +1,6 @@
-use std::fs::File;
-use std::io::{prelude::*, BufReader};
+use regex::Regex;
 
-type Input = Vec<String>;
+type Input = String;
 type Output1 = i64;
 type Output2 = i64;
 
@@ -10,14 +9,20 @@ const DAY: usize = 3;
 fn read_data(is_test: bool) -> Input {
   let extension = if is_test { "test.txt" } else { "txt" };
   let filename = format!("./resources/{}.{}", DAY, extension);
-  let file: File = File::open(&filename).expect(&format!("Cannot open file {}", &filename));
-  let reader = BufReader::new(file);
-  let line_iter = reader.lines();
-  line_iter.map(|l| l.unwrap()).collect()
+  let content =
+    std::fs::read_to_string(&filename).expect(&format!("Cannot open file {}", &filename));
+  content
 }
 
 fn initial(input: Input) -> Output1 {
-  unimplemented!()
+  let re = Regex::new(r"mul\(((\d{1,3})),(\d{1,3})\)").unwrap();
+  let mut score = 0;
+  for cap in re.captures_iter(&input) {
+    let a = cap[2].parse::<i64>().unwrap();
+    let b = cap[3].parse::<i64>().unwrap();
+    score += a * b;
+  }
+  score
 }
 
 fn extra(input: Input) -> Output2 {
@@ -42,7 +47,7 @@ mod tests {
   fn simple() {
     let input = read_data(true);
     let score = initial(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 161)
   }
 
   #[test]
