@@ -1,4 +1,5 @@
 mod e1;
+mod e2;
 
 use std::env;
 fn main() {
@@ -12,6 +13,7 @@ fn main() {
 
   match day {
     "1" => crate::e1::solve(part),
+    "2" => crate::e2::solve(part),
     _ => unreachable!(),
   }
 }
