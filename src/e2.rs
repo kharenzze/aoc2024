@@ -58,6 +58,24 @@ impl Game {
       .map(|(a, b)| b - a)
       .collect()
   }
+
+  fn check_line_retrying(line: &Vec<i64>) -> bool {
+    let main_check = Game::check_line(line);
+    let n = line.len();
+    if main_check {
+      return true;
+    }
+
+    for i in 0..n {
+      let mut new_line = line.clone();
+      //remove element at i
+      new_line.remove(i);
+      if Game::check_line(&new_line) {
+        return true;
+      }
+    }
+    false
+  }
 }
 
 fn read_data(is_test: bool) -> Input {
@@ -81,7 +99,10 @@ fn initial(input: Input) -> Output1 {
 }
 
 fn extra(input: Input) -> Output2 {
-  unimplemented!()
+  input
+    .iter()
+    .filter(|&l| Game::check_line_retrying(l))
+    .count() as i64
 }
 
 pub fn solve(part: usize) {
@@ -109,6 +130,6 @@ mod tests {
   fn two() {
     let input = read_data(true);
     let score = extra(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 4)
   }
 }
