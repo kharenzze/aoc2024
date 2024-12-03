@@ -1,6 +1,6 @@
 mod e1;
 mod e2;
-
+mod e3;
 use std::env;
 fn main() {
   let args: Vec<String> = env::args().collect();
@@ -14,6 +14,7 @@ fn main() {
   match day {
     "1" => crate::e1::solve(part),
     "2" => crate::e2::solve(part),
+    "3" => crate::e3::solve(part),
     _ => unreachable!(),
   }
 }
