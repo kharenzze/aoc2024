@@ -15,11 +15,11 @@ fn read_data(is_test: bool) -> Input {
 }
 
 fn initial(input: Input) -> Output1 {
-  let re = Regex::new(r"mul\(((\d{1,3})),(\d{1,3})\)").unwrap();
+  let re = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)").unwrap();
   let mut score = 0;
   for cap in re.captures_iter(&input) {
-    let a = cap[2].parse::<i64>().unwrap();
-    let b = cap[3].parse::<i64>().unwrap();
+    let a = cap[1].parse::<i64>().unwrap();
+    let b = cap[2].parse::<i64>().unwrap();
     score += a * b;
   }
   score
