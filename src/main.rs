@@ -2,6 +2,7 @@ mod e1;
 mod e2;
 mod e3;
 mod e4;
+mod point;
 
 use std::env;
 fn main() {

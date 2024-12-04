@@ -1,7 +1,8 @@
+use crate::point::{Bounds, Matrix2DNavigator, PathStatus, Point};
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
-type Input = Vec<String>;
+type Input = Vec<Vec<char>>;
 type Output1 = i64;
 type Output2 = i64;
 
@@ -13,11 +14,54 @@ fn read_data(is_test: bool) -> Input {
   let file: File = File::open(&filename).expect(&format!("Cannot open file {}", &filename));
   let reader = BufReader::new(file);
   let line_iter = reader.lines();
-  line_iter.map(|l| l.unwrap()).collect()
+  line_iter.map(|l| l.unwrap().chars().collect()).collect()
 }
 
+static DIRECTIONS: [Point; 8] = [
+  Point::new(0, 1),
+  Point::new(1, 0),
+  Point::new(0, -1),
+  Point::new(-1, 0),
+  Point::new(1, 1),
+  Point::new(-1, -1),
+  Point::new(1, -1),
+  Point::new(-1, 1),
+];
+
+const TARGET: &str = "XMAS";
+
 fn initial(input: Input) -> Output1 {
-  unimplemented!()
+  let mut score: Output1 = 0;
+  let bounds = Bounds::from_dims(input.len(), input[0].len());
+  for (i, line) in input.iter().enumerate() {
+    for (j, &c) in line.iter().enumerate() {
+      if c != 'X' {
+        continue;
+      }
+      let current = Point::new(i as i64, j as i64);
+      for &direction in DIRECTIONS.iter() {
+        let mut cursor = Matrix2DNavigator {
+          bounds,
+          current,
+          direction,
+        };
+
+        let path = cursor.get_path(4);
+        if path.status != PathStatus::Full {
+          continue;
+        }
+        let chars = path
+          .points
+          .iter()
+          .map(|p| input[p.x as usize][p.y as usize]);
+        let string: String = chars.collect();
+        if string.eq(TARGET) {
+          score += 1;
+        }
+      }
+    }
+  }
+  score
 }
 
 fn extra(input: Input) -> Output2 {
@@ -42,7 +86,7 @@ mod tests {
   fn simple() {
     let input = read_data(true);
     let score = initial(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 18)
   }
 
   #[test]
