@@ -23,6 +23,13 @@ impl Point {
       && self.y >= bounds.min.y
       && self.y <= bounds.max.y
   }
+
+  pub fn opposite(&self) -> Self {
+    Self {
+      x: -self.x,
+      y: -self.y,
+    }
+  }
 }
 
 impl Add for Point {
