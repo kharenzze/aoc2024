@@ -65,7 +65,62 @@ fn initial(input: Input) -> Output1 {
 }
 
 fn extra(input: Input) -> Output2 {
-  unimplemented!()
+  let mut score: Output1 = 0;
+  let bounds = Bounds::from_dims(input.len(), input[0].len());
+
+  let check_substring = |s: &str| s.eq("MAS") || s.eq("SAM");
+  for (i, line) in input.iter().enumerate().skip(1) {
+    if i == (input.len() - 1) {
+      break;
+    }
+    for (j, &c) in line.iter().enumerate().skip(1) {
+      if j == (line.len() - 1) {
+        break;
+      }
+      if c != 'A' {
+        continue;
+      }
+
+      let current = Point::new(i as i64, j as i64);
+
+      //get first diagonal chars
+      let direction = Point::new(1, 1);
+      let mut cursor = Matrix2DNavigator {
+        bounds,
+        current: current + direction.opposite(),
+        direction,
+      };
+      let path = cursor.get_path(3);
+      let chars = path
+        .points
+        .iter()
+        .map(|p| input[p.x as usize][p.y as usize]);
+      let string: String = chars.collect();
+      if !check_substring(&string) {
+        continue;
+      }
+
+      //same for second diagonal
+      let direction = Point::new(-1, 1);
+      let mut cursor = Matrix2DNavigator {
+        bounds,
+        current: current + direction.opposite(),
+        direction,
+      };
+      let path = cursor.get_path(3);
+      let chars = path
+        .points
+        .iter()
+        .map(|p| input[p.x as usize][p.y as usize]);
+      let string: String = chars.collect();
+      if !check_substring(&string) {
+        continue;
+      }
+
+      score += 1;
+    }
+  }
+  score
 }
 
 pub fn solve(part: usize) {
@@ -93,6 +148,6 @@ mod tests {
   fn two() {
     let input = read_data(true);
     let score = extra(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 9)
   }
 }
