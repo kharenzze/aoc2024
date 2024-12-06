@@ -1,6 +1,6 @@
-use std::ops::Add;
+use std::ops::{Add, AddAssign};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Point {
   pub x: i64,
   pub y: i64,
@@ -40,6 +40,12 @@ impl Add for Point {
       x: self.x + other.x,
       y: self.y + other.y,
     }
+  }
+}
+
+impl AddAssign for Point {
+  fn add_assign(&mut self, other: Self) {
+    *self = *self + other;
   }
 }
 
