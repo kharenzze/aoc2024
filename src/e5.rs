@@ -55,6 +55,37 @@ impl Case {
     true
   }
 
+  fn fix(&self, left_wing: &Wing) -> Self {
+    let mut new_case = self.0.clone();
+    let l = self.0.len();
+    'main: loop {
+      for (i, left) in new_case.iter().take(l - 1).enumerate() {
+        let wing = left_wing.get(left);
+        if wing.is_none() {
+          continue;
+        }
+        let wing = wing.unwrap();
+
+        let invalid = {
+          let ref case = new_case;
+          let mut right = case.iter().enumerate().skip(i + 1);
+          let occurrence = right.find(|(_, r)| wing.contains(r));
+          occurrence
+        };
+
+        if let Some((j, &value)) = invalid {
+          new_case.remove(j);
+          new_case.insert(i, value);
+
+          //try again
+          continue 'main;
+        }
+      }
+      break;
+    }
+    Self(new_case)
+  }
+
   fn get_middle_value(&self) -> i64 {
     self.0[self.0.len() / 2]
   }
@@ -87,7 +118,20 @@ fn initial(input: Input) -> Output1 {
 }
 
 fn extra(input: Input) -> Output2 {
-  unimplemented!()
+  let mut left_wing: Wing = HashMap::new();
+  let mut right_wing: Wing = HashMap::new();
+  let rules_iter = input.0.iter().map(|r| Rule::parse(r));
+  for rule in rules_iter {
+    left_wing.entry(rule.right).or_default().insert(rule.left);
+    right_wing.entry(rule.left).or_default().insert(rule.right);
+  }
+
+  let cases_iter = input.1.iter().map(|c| Case::parse(c));
+  let invalid = cases_iter
+    .filter(|c| !c.is_valid(&left_wing))
+    .map(|c| c.fix(&left_wing));
+  let score: Output2 = invalid.map(|c| c.get_middle_value()).sum();
+  score
 }
 
 pub fn solve(part: usize) {
@@ -122,6 +166,6 @@ mod tests {
   fn two() {
     let input = read_data(true);
     let score = extra(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 123)
   }
 }
