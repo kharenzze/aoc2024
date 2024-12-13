@@ -37,7 +37,6 @@ impl Request {
   fn is_valid(&self) -> bool {
     let l = self.values.len();
     let l_ops = l - 1;
-    const OPERATIONS: [Operation; 2] = [Operation::Add, Operation::Mul];
     let mut operations: Vec<Operation> = vec![];
     let mut accs = vec![self.values[0]];
 
@@ -79,6 +78,51 @@ impl Request {
       }
     }
   }
+
+  fn is_valid_v2(&self) -> bool {
+    let l = self.values.len();
+    let l_ops = l - 1;
+    let mut operations: Vec<Operation> = vec![];
+    let mut accs = vec![self.values[0]];
+
+    loop {
+      let mut depth = operations.len();
+      if depth < l_ops {
+        //go deeper
+        let op = OperationCursorV2::first();
+        operations.push(op);
+        let last_acc = accs.last().unwrap();
+        let next_value = self.values[depth + 1];
+        let next_acc = op.apply(*last_acc, next_value);
+        accs.push(next_acc);
+        continue;
+      }
+
+      let last_acc = accs.last().unwrap();
+      if last_acc == &self.result {
+        return true;
+      }
+
+      //go up
+      loop {
+        let op = operations.pop().unwrap();
+        accs.pop();
+        depth -= 1;
+        let Some(next_op) = OperationCursorV2::next(&op) else {
+          if depth == 0 {
+            return false;
+          }
+          continue;
+        };
+        operations.push(next_op);
+        let next_value = self.values[depth + 1];
+        let last_acc = accs.last().unwrap();
+        let next_acc = next_op.apply(*last_acc, next_value);
+        accs.push(next_acc);
+        break;
+      }
+    }
+  }
 }
 
 struct OperationCursor {}
@@ -88,6 +132,23 @@ impl OperationCursor {
     match op {
       Operation::Add => Some(Operation::Mul),
       Operation::Mul => None,
+      _ => unreachable!(),
+    }
+  }
+
+  const fn first() -> Operation {
+    Operation::Add
+  }
+}
+
+struct OperationCursorV2 {}
+
+impl OperationCursorV2 {
+  const fn next(op: &Operation) -> Option<Operation> {
+    match op {
+      Operation::Add => Some(Operation::Mul),
+      Operation::Mul => Some(Operation::Concat),
+      Operation::Concat => None,
     }
   }
 
@@ -100,6 +161,7 @@ impl OperationCursor {
 enum Operation {
   Add,
   Mul,
+  Concat,
 }
 
 impl Operation {
@@ -107,6 +169,11 @@ impl Operation {
     match self {
       Operation::Add => a + b,
       Operation::Mul => a * b,
+      Operation::Concat => {
+        let a_str = a.to_string();
+        let b_str = b.to_string();
+        format!("{}{}", a_str, b_str).parse().unwrap()
+      }
     }
   }
 }
@@ -130,7 +197,12 @@ fn initial(input: Input) -> Output1 {
 }
 
 fn extra(input: Input) -> Output2 {
-  unimplemented!()
+  input
+    .into_iter()
+    .map(|l| Request::from(&l))
+    .filter(Request::is_valid_v2)
+    .map(|r| r.result)
+    .sum()
 }
 
 pub fn solve(part: usize) {
@@ -158,6 +230,6 @@ mod tests {
   fn two() {
     let input = read_data(true);
     let score = extra(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 11387)
   }
 }
