@@ -44,17 +44,6 @@ impl Direction {
       Direction::Right => Direction::Down,
     }
   }
-
-  fn from_point(point: Point) -> Self {
-    let point = point.normalize();
-    match point.to_tuple() {
-      (0, -1) => Direction::Up,
-      (0, 1) => Direction::Down,
-      (-1, 0) => Direction::Left,
-      (1, 0) => Direction::Right,
-      _ => unreachable!(),
-    }
-  }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

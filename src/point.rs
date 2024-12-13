@@ -12,6 +12,7 @@ pub struct Bounds {
   max: Point,
 }
 
+#[allow(unused)]
 impl Point {
   pub const fn new(x: i64, y: i64) -> Self {
     Self { x, y }

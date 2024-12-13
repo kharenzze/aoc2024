@@ -5,6 +5,7 @@ mod e4;
 mod e5;
 mod e6;
 mod e7;
+mod e8;
 mod point;
 
 use std::env;
@@ -29,9 +30,10 @@ fn main() {
     "5" => crate::e5::solve(part),
     "6" => crate::e6::solve(part),
     "7" => crate::e7::solve(part),
+    "8" => crate::e8::solve(part),
     _ => unreachable!(),
   }
 
   let elapsed = now.elapsed();
-  println!("{elapsed:?}");
+  println!("Elapsed: {elapsed:?}");
 }
