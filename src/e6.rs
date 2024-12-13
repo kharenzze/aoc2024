@@ -18,7 +18,7 @@ fn read_data(is_test: bool) -> Input {
   line_iter.map(|l| l.unwrap()).collect()
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum Direction {
   Up,
   Down,
@@ -44,9 +44,20 @@ impl Direction {
       Direction::Right => Direction::Down,
     }
   }
+
+  fn from_point(point: Point) -> Self {
+    let point = point.normalize();
+    match point.to_tuple() {
+      (0, -1) => Direction::Up,
+      (0, 1) => Direction::Down,
+      (-1, 0) => Direction::Left,
+      (1, 0) => Direction::Right,
+      _ => unreachable!(),
+    }
+  }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Cell {
   Empty,
   Wall,
@@ -63,6 +74,7 @@ impl Cell {
   }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct GameCursor {
   position: Point,
   bounds: Bounds,
@@ -146,7 +158,63 @@ fn initial(input: Input) -> Output1 {
 }
 
 fn extra(input: Input) -> Output2 {
-  unimplemented!()
+  let mut new_blocks: HashSet<Point> = HashSet::new();
+  let mut visited: HashSet<Point> = HashSet::new();
+  let game = Game::new(input);
+  let mut cursor = GameCursor {
+    position: game.guard_position(),
+    bounds: Bounds::from_dims(game.map.len(), game.map[0].len()),
+    direction: Direction::Up,
+  };
+
+  loop {
+    visited.insert(cursor.position);
+    let Some(next) = cursor.next() else {
+      //out of bounds
+      break;
+    };
+    let ref next_cell = game.map[next.y as usize][next.x as usize];
+    if let Cell::Wall = next_cell {
+      cursor.rotate();
+    } else if let Cell::Empty = next_cell {
+      if !visited.contains(&next) {
+        //try to set a new block and see what happens
+        let mut corner_tracker: HashSet<GameCursor> = HashSet::new();
+        let mut explore_cursor = cursor.clone();
+        corner_tracker.insert(explore_cursor.clone());
+        explore_cursor.rotate();
+
+        loop {
+          if corner_tracker.contains(&explore_cursor) {
+            new_blocks.insert(next);
+            break;
+          }
+
+          let Some(explore_next) = explore_cursor.next() else {
+            //out of bounds
+            break;
+          };
+          let ref explore_next_cell = game.map[explore_next.y as usize][explore_next.x as usize];
+          let corrected_next_cell: &Cell = if explore_next == next {
+            &Cell::Wall
+          } else {
+            explore_next_cell
+          };
+          if &Cell::Wall == corrected_next_cell {
+            corner_tracker.insert(explore_cursor.clone());
+            explore_cursor.rotate();
+          } else {
+            explore_cursor.advance();
+          }
+        }
+      }
+      cursor.advance();
+    } else {
+      cursor.advance();
+    }
+  }
+
+  new_blocks.len() as i64
 }
 
 pub fn solve(part: usize) {
@@ -174,6 +242,6 @@ mod tests {
   fn two() {
     let input = read_data(true);
     let score = extra(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 6)
   }
 }

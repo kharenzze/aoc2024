@@ -7,6 +7,8 @@ mod e6;
 mod point;
 
 use std::env;
+use std::time::Instant;
+
 fn main() {
   let args: Vec<String> = env::args().collect();
   if args.len() != 3 {
@@ -15,6 +17,8 @@ fn main() {
 
   let day: &str = args.get(1).unwrap();
   let part: usize = args.get(2).unwrap().parse().unwrap();
+
+  let now = Instant::now();
 
   match day {
     "1" => crate::e1::solve(part),
@@ -25,4 +29,7 @@ fn main() {
     "6" => crate::e6::solve(part),
     _ => unreachable!(),
   }
+
+  let elapsed = now.elapsed();
+  println!("{elapsed:?}");
 }
