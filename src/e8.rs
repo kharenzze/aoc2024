@@ -25,7 +25,8 @@ fn initial(input: Input) -> Output1 {
 }
 
 fn extra(input: Input) -> Output2 {
-  unimplemented!()
+  let game = Game::new(input);
+  game.solve_v2()
 }
 
 pub fn solve(part: usize) {
@@ -91,6 +92,45 @@ impl Game {
     }
     antenna_pos.len() as i64
   }
+
+  fn solve_v2(&self) -> i64 {
+    let mut antenna_pos: HashSet<Point> = HashSet::new();
+    for (_, points) in self.pos_map.iter() {
+      let n = points.len();
+      if n < 2 {
+        continue;
+      }
+      for (i, &a) in points.iter().enumerate().take(n - 1) {
+        for &b in points.iter().skip(i + 1) {
+          let diff = (b - a);
+          let mut start = b;
+          let step = -diff;
+          loop {
+            let next = start + step;
+            if !self.bounds.check(&next) {
+              break;
+            } else {
+              antenna_pos.insert(next);
+            }
+            start = next;
+          }
+
+          start = a;
+          let step = diff;
+          loop {
+            let next = start + step;
+            if !self.bounds.check(&next) {
+              break;
+            } else {
+              antenna_pos.insert(next);
+            }
+            start = next;
+          }
+        }
+      }
+    }
+    antenna_pos.len() as i64
+  }
 }
 
 #[cfg(test)]
@@ -108,6 +148,6 @@ mod tests {
   fn two() {
     let input = read_data(true);
     let score = extra(input);
-    assert_eq!(score, 13)
+    assert_eq!(score, 34)
   }
 }
