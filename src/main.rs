@@ -6,6 +6,7 @@ mod e5;
 mod e6;
 mod e7;
 mod e8;
+mod e9;
 mod point;
 
 use std::env;
@@ -31,6 +32,7 @@ fn main() {
     "6" => crate::e6::solve(part),
     "7" => crate::e7::solve(part),
     "8" => crate::e8::solve(part),
+    "9" => crate::e9::solve(part),
     _ => unreachable!(),
   }
 

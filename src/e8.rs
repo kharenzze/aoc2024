@@ -41,7 +41,6 @@ pub fn solve(part: usize) {
 
 #[derive(Debug, Clone)]
 struct Game {
-  grid: Vec<Vec<char>>,
   pos_map: HashMap<char, HashSet<Point>>,
   bounds: Bounds,
 }
@@ -62,11 +61,7 @@ impl Game {
     let x = grid[0].len();
     let bounds = Bounds::from_dims(x, y);
 
-    Self {
-      grid,
-      pos_map,
-      bounds,
-    }
+    Self { pos_map, bounds }
   }
 
   fn solve(&self) -> i64 {
@@ -78,7 +73,7 @@ impl Game {
       }
       for (i, &a) in points.iter().enumerate().take(n - 1) {
         for &b in points.iter().skip(i + 1) {
-          let diff = (b - a);
+          let diff = b - a;
           let antenna = a - diff;
           if self.bounds.check(&antenna) {
             antenna_pos.insert(antenna);
@@ -102,7 +97,7 @@ impl Game {
       }
       for (i, &a) in points.iter().enumerate().take(n - 1) {
         for &b in points.iter().skip(i + 1) {
-          let diff = (b - a);
+          let diff = b - a;
           let mut start = b;
           let step = -diff;
           loop {
