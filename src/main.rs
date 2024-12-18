@@ -7,7 +7,10 @@ mod e6;
 mod e7;
 mod e8;
 mod e9;
+
+mod numbers;
 mod point;
+mod range;
 
 use std::env;
 use std::time::Instant;
