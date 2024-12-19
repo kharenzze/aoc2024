@@ -101,7 +101,49 @@ fn initial(input: Input) -> Output1 {
 }
 
 fn extra(input: Input) -> Output2 {
-  unimplemented!()
+  let bounds = Bounds::from_dims(input[0].len(), input.len());
+  let mut zeros: Vec<Point> = vec![];
+  for y in 0..input.len() {
+    for x in 0..input[y].len() {
+      if input[y][x] == 0 {
+        zeros.push(Point::new(x as i64, y as i64));
+      }
+    }
+  }
+
+  let mut navigator = Matrix2DNavigator {
+    bounds,
+    current: Point::default(),
+    direction: Direction::Right.to_point(),
+  };
+
+  let mut score: i64 = 0;
+  for z in zeros {
+    let mut open = vec![z];
+    let mut top_positions: Vec<Point> = vec![];
+    while let Some(p) = open.pop() {
+      let current_value = input[p.y as usize][p.x as usize];
+      navigator.current = p;
+      let expected_next_value = current_value + 1;
+      for d in DIRECTIONS {
+        navigator.direction = d.to_point();
+        let Some(next) = navigator.read_next() else {
+          continue;
+        };
+        let next_value = input[next.y as usize][next.x as usize];
+        if next_value == expected_next_value {
+          if next_value == MAX_VALUE {
+            top_positions.push(next);
+          } else {
+            open.push(next);
+          }
+        }
+      }
+    }
+    score += top_positions.len() as i64;
+  }
+
+  score
 }
 
 pub fn solve(part: usize) {
