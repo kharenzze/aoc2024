@@ -93,7 +93,7 @@ fn sort_blocks(blocks: &Vec<Block>) -> Vec<Block> {
 
     //find target block in right side
     if current_right.is_none() {
-      let mut next = blocks[right];
+      let next = blocks[right];
       if next.block_type == BlockType::Empty {
         right -= 1;
         continue;
@@ -132,7 +132,6 @@ fn sort_blocks(blocks: &Vec<Block>) -> Vec<Block> {
 }
 
 fn sort_blocks_v2(blocks: &Vec<Block>) -> Vec<Block> {
-  let l = blocks.len();
   let mut bmap: BTreeMap<i64, Block> = BTreeMap::new();
 
   blocks.iter().for_each(|&block| {
