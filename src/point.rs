@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Point {
   pub x: i64,
   pub y: i64,
@@ -154,9 +154,15 @@ pub struct Path {
 
 impl Matrix2DNavigator {
   pub fn next(&mut self) -> Option<Point> {
+    self.read_next().map(|p| {
+      self.current = p;
+      p
+    })
+  }
+
+  pub fn read_next(&self) -> Option<Point> {
     let next = self.current + self.direction;
     if self.bounds.check(&next) {
-      self.current = next;
       Some(next)
     } else {
       None
