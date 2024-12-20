@@ -1,6 +1,7 @@
 mod e1;
 mod e10;
 mod e11;
+mod e12;
 mod e2;
 mod e3;
 mod e4;
@@ -40,6 +41,7 @@ fn main() {
     "9" => crate::e9::solve(part),
     "10" => crate::e10::solve(part),
     "11" => crate::e11::solve(part),
+    "12" => crate::e12::solve(part),
     _ => unreachable!(),
   }
 
